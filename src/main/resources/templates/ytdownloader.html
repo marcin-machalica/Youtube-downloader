@@ -14,6 +14,9 @@
 		</pre>
 	</form>
 	<br />
-	<!-- formats -->
+	<ul th:each="format : ${formats}">
+		<li th:text="${format.key}"></li>
+		<li th:text="${format.value}"></li>
+	</ul>
 </body>
 </html>

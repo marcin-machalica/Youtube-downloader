@@ -1,7 +1,6 @@
 package machalica.marcin.spring.ytdownloader.downloader;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.sapher.youtubedl.YoutubeDLException;
 
 
 @Controller
@@ -24,8 +25,14 @@ public class YtDownloaderController {
 	
 	@RequestMapping(value = "yt-downloader", method = RequestMethod.POST)
 	public String getFormats(@ModelAttribute("path") String path, ModelMap model) {
-		List<String> formats = new ArrayList<String>();
-		model.addAttribute("format", formats);
+		HashMap<String, String> formats = null;
+		try {
+			formats = ytDownloaderService.getAvaibleFormats(path);
+		} catch (YoutubeDLException ex) {
+			ex.printStackTrace();
+		}
+		model.addAttribute("formats", formats);
 		return "ytdownloader";
 	}
+	
 }
