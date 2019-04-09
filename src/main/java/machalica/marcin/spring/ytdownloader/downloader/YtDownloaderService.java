@@ -1,5 +1,6 @@
 package machalica.marcin.spring.ytdownloader.downloader;
 
+import java.io.File;
 import java.util.HashMap;
 
 import org.springframework.stereotype.Service;
@@ -13,19 +14,72 @@ import com.sapher.youtubedl.YoutubeDLResponse;
 public class YtDownloaderService implements YtDownloaderDao {
 
 	@Override
-	public HashMap<String, String> getAvaibleFormats(String videoUrl) throws YoutubeDLException {
+	public YtDownloadFile getFileInfo(String videoUrl) throws YoutubeDLException {
+		HashMap<String, String> formats = getAvaibleFormats(videoUrl);
+		if (formats == null || formats.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
+		} else {
+			return new YtDownloadFile(formats, videoUrl);			
+		}
+	}
+
+	@Override
+	public File downloadFile(String videoUrl, String format) throws YoutubeDLException {
+		String dir = "./downloaded_files/";
+		String fileName = getFileName(videoUrl, format);
+		String filePath = dir.substring(2) + fileName;
+		
+		File file = new File(filePath);
+
+		if (file.exists()) { 
+			System.out.println(fileName + " was downloaded before");
+			return file;
+		}
+		
+		System.out.println(fileName + "wasn't downloaded before");
+		
+		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, dir);
+		request.setOption("ignore-errors"); // --ignore-errors
+		request.setOption("output", "%(title)s.%(ext)s"); // --output "%(title)s"
+		request.setOption("retries", 10); // --retries 10
+		request.setOption("format", format); // --format
+		
+		YoutubeDLResponse response = YoutubeDL.execute(request);
+		String stdOut = response.getOut();
+
+		String[] firstSplit = stdOut.split("Destination: ");
+		if (firstSplit.length != 2) {
+			return null;
+		} else {
+			System.out.println(fileName + " downloaded successfully");
+			return file;
+		}
+	}
+	
+	private String getFileName(String videoUrl, String format) throws YoutubeDLException {
+		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
+		request.setOption("ignore-errors"); // --ignore-errors
+		request.setOption("retries", 10); // --retries 10
+		request.setOption("get-filename"); // --get-title
+		request.setOption("output", "%(title)s.%(ext)s");	// --output "%(title)s.%(ext)s"
+		request.setOption("format", format); // --format
+		
+		YoutubeDLResponse response = YoutubeDL.execute(request);	
+		return response.getOut().trim();
+	}
+
+	private HashMap<String, String> getAvaibleFormats(String videoUrl) throws YoutubeDLException {
 		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
 		request.setOption("ignore-errors");		// --ignore-errors
-		request.setOption("output", "%(title)s");	// --output "%(title)s"
 		request.setOption("retries", 10);		// --retries 10
 		request.setOption("list-formats");	// --list-formats
 
 		YoutubeDLResponse response = YoutubeDL.execute(request);
 		String stdOut = response.getOut();
-				
+		
 		String[] formatsSplitArr = stdOut.split("format code  extension  resolution note");
 		if (formatsSplitArr.length != 2) {
-			return new HashMap<String, String>();
+			return null;
 		} else {
 			String[] formatsArr = formatsSplitArr[1].trim().split("\n");
 			HashMap<String, String> formats = new HashMap<String, String>();
@@ -33,14 +87,8 @@ public class YtDownloaderService implements YtDownloaderDao {
 			for(String format : formatsArr) {
 				formats.put(format, format.split(" ")[0]);
 			}
-			
 			return formats;
-		}		
+		}
 	}
-
-	@Override
-	public boolean downloadFile(String videoUrl, String format) {
-		return false;
-	}
-
+	
 }
