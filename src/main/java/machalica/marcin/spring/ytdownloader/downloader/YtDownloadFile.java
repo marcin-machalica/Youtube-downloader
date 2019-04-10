@@ -1,18 +1,18 @@
 package machalica.marcin.spring.ytdownloader.downloader;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class YtDownloadFile {
-	private static final YtDownloadFile EMPTY_YT_DOWNLOAD_FILE = new YtDownloadFile(new HashMap<String, String>(), "");
-	private final HashMap<String, String> formats;
+	private static final YtDownloadFile EMPTY_YT_DOWNLOAD_FILE = new YtDownloadFile(new LinkedHashMap<String, String>(), "");
+	private final LinkedHashMap<String, String> formats;
 	private final String url;
 
-	public YtDownloadFile(HashMap<String, String> formats, String url) {
-		this.formats = formats;
+	public YtDownloadFile(LinkedHashMap<String, String> formats2, String url) {
+		this.formats = formats2;
 		this.url = url;
 	}
 
-	public HashMap<String, String> getFormats() {
+	public LinkedHashMap<String, String> getFormats() {
 		return formats;
 	}
 

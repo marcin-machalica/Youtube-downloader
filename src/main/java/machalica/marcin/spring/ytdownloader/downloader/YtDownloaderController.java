@@ -1,6 +1,11 @@
 package machalica.marcin.spring.ytdownloader.downloader;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,7 +42,8 @@ public class YtDownloaderController {
 	}
 
 	@GetMapping("/yt-downloader/download")
-	public String download(@RequestParam String url, @RequestParam(name = "format") String format, ModelMap model) {
+	public void download(@RequestParam String url, @RequestParam(name = "format") String format,
+			HttpServletResponse response) {
 		File file = null;
 		try {
 			file = ytDownloaderService.downloadFile(url, format);
@@ -45,14 +51,19 @@ public class YtDownloaderController {
 			ex.printStackTrace();
 		}
 
-		if (file != null) {
-			System.out.println(file.getPath());
-		} else {
+		if (file == null) {
 			System.out.println("File is null");
-		}
+		} else {
+			System.out.println(file.getPath());
 
-		model.addAttribute("file_info", YtDownloadFile.getEmptyYtDownloadFile());
-		return "ytdownloader";
+			response.addHeader("Content-Disposition", "attachment; filename=" + file.getName());
+			try {
+				Files.copy(Paths.get(file.getPath()), response.getOutputStream());
+				response.getOutputStream().flush();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 }
