@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Getting Started: Serving Web Content</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<p>Download youtube videos</p>
+	<br />
+	<form action="/yt-downloader" method="post">
+		<pre>
+		Link to video: <input type="text" name="url" />
+		<input type="submit" name="submit" />
+		</pre>
+	</form>
+	<br />
+	<ul th:each="format : ${file_info.getFormats()}">
+		<li>
+			<a th:text="${format.key}"
+			th:href="@{'/yt-downloader/download?url=' + ${file_info.getUrl()} + '&format=' + ${format.value}}"></a>
+		</li>
+	</ul>
+</body>
+</html>
