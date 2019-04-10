@@ -17,7 +17,7 @@
 	<ul th:each="format : ${file_info.getFormats()}">
 		<li>
 			<a th:text="${format.key}"
-			th:href="@{'/yt-downloader/download?url=' + ${file_info.getUrl()} + '&format=' + ${format.value}}"></a>
+			th:href="@{'/yt-downloader/' + ${T(machalica.marcin.spring.ytdownloader.downloader.YtUrlHelper).getVideoUrlPart(file_info.getUrl())} + '/' + ${format.value}}"></a>
 		</li>
 	</ul>
 </body>
