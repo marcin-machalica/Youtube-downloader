@@ -46,8 +46,8 @@ public class YtDownloaderService implements YtDownloaderDao {
 		LinkedHashMap<String, String> qrCodes = new LinkedHashMap<String, String>();
 
 		for (Map.Entry<String, String> entry : formats.entrySet()) {
-			String qrCodeBase64 = QrCodeGenerator.getQRCodeImage(String.format(URL_TEMPLATE, entry.getValue()), 100,
-					100);
+			String qrCodeBase64 = QrCodeGenerator.getQRCodeImage(String.format(URL_TEMPLATE, entry.getValue()), 150,
+					150);
 			qrCodes.put(entry.getKey(), qrCodeBase64);
 		}
 
