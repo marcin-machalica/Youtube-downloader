@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,26 @@ public class YtDownloaderService implements YtDownloaderDao {
 		LinkedHashMap<String, String> formats = getAvaibleFormats(videoUrl);
 		if (formats == null || formats.isEmpty()) {
 			return YtDownloadFile.getEmptyYtDownloadFile();
-		} else {
-			return new YtDownloadFile(formats, videoUrl);
 		}
+		
+		LinkedHashMap<String, String> qrCodes = getQrCodes(videoUrl, formats);
+		if (qrCodes == null || qrCodes.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
+		}
+		
+		return new YtDownloadFile(formats, qrCodes, videoUrl);
+	}
+
+	private LinkedHashMap<String, String> getQrCodes(String videoUrl, LinkedHashMap<String, String> formats) {
+		final String URL_TEMPLATE = YtUrlHelper.getVideoUrlPart(videoUrl) + "/%s";
+		LinkedHashMap<String, String> qrCodes = new LinkedHashMap<String, String>();
+		
+		for(Map.Entry<String, String> entry : formats.entrySet()) {
+			String qrCodeBase64 = QrCodeGenerator.getQRCodeImage(String.format(URL_TEMPLATE, entry.getValue()), 100, 100);
+			qrCodes.put(entry.getKey(), qrCodeBase64);
+		}
+		
+		return qrCodes;
 	}
 
 	@Override
