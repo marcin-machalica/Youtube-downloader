@@ -14,6 +14,9 @@
 		</pre>
 	</form>
 	<br />
+	<img th:src="${file_info.getThumbnailUrl()}" alt="" width="100" height="60" />
+	<p th:text="${file_info.getTitle()}"></p>
+	<a th:text="${file_info.getUrl()}" th:href="${file_info.getUrl()}"></a>
 	<ul th:each="format : ${file_info.getFormats()}">
 		<li>
 			<a th:text="${format.key}"
