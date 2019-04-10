@@ -1,0 +1,79 @@
+body {
+	background-color: #e5e5e5;
+}
+
+div.menu {
+	height: 20px;
+	margin-bottom: 20px;
+}
+
+div.ui.segment {
+	position: relative;
+}
+
+h1.ui.header {
+	text-align: center;
+}
+
+.ui.form .ui.input {
+	width: 90%;
+	display: block;
+	margin-left: 2%;
+}
+
+.ui.form .ui.primary.button {
+	margin: 20px 40%;
+	width: 20%;
+}
+
+div.error-segment p {
+	padding: 20px
+}
+
+hr {
+	border: 0;
+	height: 1px;
+	background: #333;
+	background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+
+#url-data-segment {
+	padding-top: 20px;
+	padding-bottom: 20px;
+	position: relative;
+	min-height: 100px;
+}
+
+#url-data-text-segment {
+	position: absolute;
+	top: 20px;
+	left: 180px;
+	word-wrap: break-word;
+}
+
+div.download-url a {
+	position: absolute;
+	top: 30px;
+	left: 180px;
+}
+
+div.footer {
+	height: 50px;
+	margin-top: 50px;
+}
+
+@media only screen and (max-width: 450px) {
+	#url-data-text-segment {
+		width: 120px;
+	}
+	.ui.form .ui.input {
+		margin-left: 0;
+	}
+}
+
+@media only screen and (max-width: 550px) {
+	.ui.form .ui.primary.button {
+		margin: 20px 30%;
+		width: 40%;
+	}
+}

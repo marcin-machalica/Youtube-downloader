@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.sapher.youtubedl.YoutubeDL;
@@ -15,6 +16,7 @@ import com.sapher.youtubedl.YoutubeDLResponse;
 
 @Service
 public class YtDownloaderService implements YtDownloaderDao {
+	private static final Logger logger = Logger.getLogger(YtDownloaderService.class);
 
 	@Override
 	public YtDownloadFile getFileInfo(String videoUrl) throws YoutubeDLException {
@@ -22,24 +24,35 @@ public class YtDownloaderService implements YtDownloaderDao {
 		if (formats == null || formats.isEmpty()) {
 			return YtDownloadFile.getEmptyYtDownloadFile();
 		}
-		
+
 		LinkedHashMap<String, String> qrCodes = getQrCodes(videoUrl, formats);
 		if (qrCodes == null || qrCodes.isEmpty()) {
 			return YtDownloadFile.getEmptyYtDownloadFile();
 		}
-		
-		return new YtDownloadFile(formats, qrCodes, videoUrl);
+
+		String title = getTitle(videoUrl);
+		if (title == null || title.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
+		}
+
+		String thumbnailUrl = getThumbnailUrl(videoUrl);
+		if (thumbnailUrl == null || thumbnailUrl.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
+		}
+
+		return new YtDownloadFile(formats, qrCodes, videoUrl, title, thumbnailUrl);
 	}
 
 	private LinkedHashMap<String, String> getQrCodes(String videoUrl, LinkedHashMap<String, String> formats) {
 		final String URL_TEMPLATE = YtUrlHelper.getVideoUrlPart(videoUrl) + "/%s";
 		LinkedHashMap<String, String> qrCodes = new LinkedHashMap<String, String>();
-		
-		for(Map.Entry<String, String> entry : formats.entrySet()) {
-			String qrCodeBase64 = QrCodeGenerator.getQRCodeImage(String.format(URL_TEMPLATE, entry.getValue()), 100, 100);
+
+		for (Map.Entry<String, String> entry : formats.entrySet()) {
+			String qrCodeBase64 = QrCodeGenerator.getQRCodeImage(String.format(URL_TEMPLATE, entry.getValue()), 150,
+					150);
 			qrCodes.put(entry.getKey(), qrCodeBase64);
 		}
-		
+
 		return qrCodes;
 	}
 
@@ -52,15 +65,15 @@ public class YtDownloaderService implements YtDownloaderDao {
 		File file = new File(filePath);
 
 		if (file.exists()) {
-			System.out.println(fileName + " was downloaded before");
+			logger.debug(fileName + " was downloaded before");
 			return file;
 		}
 
-		System.out.println(fileName + " wasn't downloaded before");
+		logger.debug(fileName + " wasn't downloaded before");
 
 		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, dir);
 		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("output", "%(title)s.%(ext)s"); // --output "%(title)s"
+		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
 		request.setOption("retries", 10); // --retries 10
 		request.setOption("format", format); // --format
 
@@ -71,7 +84,7 @@ public class YtDownloaderService implements YtDownloaderDao {
 		if (firstSplit.length != 2) {
 			return null;
 		} else {
-			System.out.println(fileName + " downloaded successfully");
+			logger.info(fileName + " downloaded successfully from " + videoUrl);
 			return file;
 		}
 	}
@@ -80,9 +93,31 @@ public class YtDownloaderService implements YtDownloaderDao {
 		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
 		request.setOption("ignore-errors"); // --ignore-errors
 		request.setOption("retries", 10); // --retries 10
-		request.setOption("get-filename"); // --get-title
-		request.setOption("output", "%(title)s.%(ext)s"); // --output "%(title)s.%(ext)s"
+		request.setOption("get-filename"); // --get-filename
+		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
 		request.setOption("format", format); // --format
+
+		YoutubeDLResponse response = YoutubeDL.execute(request);
+		String filename = response.getOut().trim();
+		return filename;
+	}
+
+	private String getTitle(String videoUrl) throws YoutubeDLException {
+		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
+		request.setOption("ignore-errors"); // --ignore-errors
+		request.setOption("retries", 10); // --retries 10
+		request.setOption("get-title"); // --get-title
+		request.setOption("output", "%(title)s"); // --output "%(title)s"
+
+		YoutubeDLResponse response = YoutubeDL.execute(request);
+		return response.getOut().trim();
+	}
+
+	private String getThumbnailUrl(String videoUrl) throws YoutubeDLException {
+		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
+		request.setOption("ignore-errors"); // --ignore-errors
+		request.setOption("retries", 10); // --retries 10
+		request.setOption("get-thumbnail"); // --get-thumbnail
 
 		YoutubeDLResponse response = YoutubeDL.execute(request);
 		return response.getOut().trim();

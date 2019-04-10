@@ -1,25 +1,58 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Getting Started: Serving Web Content</title>
+<title>Youtube downloader</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="../static/semantic.min.css"
+	th:href="@{/semantic.min.css}" />
+<link rel="stylesheet" type="text/css" href="../static/app.css"
+	th:href="@{/app.css}" />
 </head>
 <body>
-	<p>Download youtube videos</p>
-	<br />
-	<form action="/yt-downloader" method="post">
-		<pre>
-		Link to video: <input type="text" name="url" />
-		<input type="submit" name="submit" />
-		</pre>
-	</form>
-	<br />
-	<ul th:each="format : ${file_info.getFormats()}">
-		<li>
-			<a th:text="${format.key}"
-			th:href="@{'/yt-downloader/' + ${T(machalica.marcin.spring.ytdownloader.downloader.YtUrlHelper).getVideoUrlPart(file_info.getUrl())} + '/' + ${format.value}}"></a>
-			<img th:src="*{'data:image/png;base64,'+file_info.getQrCodes().get(format.key)}" alt="" />
-		</li>
-	</ul>
+	<div class="ui main text container">
+		<div class="menu"></div>
+		<div class="ui segment">
+			<div id="search-segment">
+				<h1 class="ui header">Download YouTube videos & audio</h1>
+				<form class="ui form" action="/yt-downloader" method="post">
+					<div class="ui input">
+						<input type="text" name="url" placeholder="Link to video" />
+					</div>
+					<input class="ui primary button" type="submit" name="submit"
+						value="Search" />
+				</form>
+			</div>
+			<div th:unless="${file_info.getError().isEmpty()}"
+				class="error-segment">
+				<p th:text="${file_info.getError()}"></p>
+			</div>
+			<div th:if="${file_info.isDataPresent()}">
+				<hr />
+				<div id="url-data-segment">
+					<img th:src="${file_info.getThumbnailUrl()}" alt="" width="150"
+						height="100" />
+					<div id="url-data-text-segment">
+						<p th:text="${file_info.getTitle()}"></p>
+						<a th:text="${file_info.getUrl()}" th:href="${file_info.getUrl()}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<ul th:remove="tag" th:each="format : ${file_info.getFormats()}">
+			<div class="ui segment">
+				<div class="qr-img">
+					<img
+						th:src="*{'data:image/png;base64,'+file_info.getQrCodes().get(format.key)}"
+						alt="" />
+				</div>
+				<div class="download-url">
+					<a th:text="${format.key}"
+						th:href="@{'/yt-downloader/' + ${T(machalica.marcin.spring.ytdownloader.downloader.YtUrlHelper).getVideoUrlPart(file_info.getUrl())} + '/' + ${format.value}}"></a>
+				</div>
+			</div>
+		</ul>
+	</div>
+	<div class="footer"></div>
 </body>
 </html>
