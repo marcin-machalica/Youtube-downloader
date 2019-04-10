@@ -18,6 +18,7 @@
 		<li>
 			<a th:text="${format.key}"
 			th:href="@{'/yt-downloader/' + ${T(machalica.marcin.spring.ytdownloader.downloader.YtUrlHelper).getVideoUrlPart(file_info.getUrl())} + '/' + ${format.value}}"></a>
+			<img th:src="*{'data:image/png;base64,'+file_info.getQrCodes().get(format.key)}" alt="" />
 		</li>
 	</ul>
 </body>
