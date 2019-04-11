@@ -46,8 +46,14 @@ public class YtDownloaderController {
 		try {
 			ytDownloadFile = ytDownloaderService.getFileInfo(url);
 		} catch (YoutubeDLException ex) {
-			logger.error(ex);
+			if (ex.toString().contains("Incomplete YouTube ID")) {
+				logger.debug(ex);
+				ytDownloadFile.setError("Not valid URL: " + url);
+			} else {
+				logger.error(ex);
+			}
 		}
+
 		model.addAttribute("file_info", ytDownloadFile);
 		return "ytdownloader";
 	}
@@ -66,7 +72,8 @@ public class YtDownloaderController {
 		} else {
 			logger.debug(file.getPath());
 
-			response.addHeader("Content-Disposition", "attachment; filename=" + YtFilenameHelper.convertFileNameToTitleWithExt(file.getName()));
+			response.addHeader("Content-Disposition",
+					"attachment; filename=" + YtFilenameHelper.convertFileNameToTitleWithExt(file.getName()));
 			response.addHeader("Content-Length", Long.toString(file.length()));
 			try {
 				Files.copy(Paths.get(file.getPath()), response.getOutputStream());

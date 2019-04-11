@@ -84,7 +84,7 @@ public class YtDownloaderService implements YtDownloaderDao {
 		if (firstSplit.length != 2) {
 			return null;
 		} else {
-			logger.debug(fileName + " downloaded successfully");
+			logger.info(fileName + " downloaded successfully from " + videoUrl);
 			return file;
 		}
 	}

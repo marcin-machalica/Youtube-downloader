@@ -26,6 +26,10 @@ h1.ui.header {
 	width: 20%;
 }
 
+div.error-segment p {
+	padding: 20px
+}
+
 hr {
 	border: 0;
 	height: 1px;
