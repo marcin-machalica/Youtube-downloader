@@ -64,7 +64,8 @@ public class YtDownloaderController {
 		} else {
 			System.out.println(file.getPath());
 
-			response.addHeader("Content-Disposition", "attachment; filename=" + file.getName());
+			response.addHeader("Content-Disposition", "attachment; filename=" + YtFilenameHelper.convertFileNameToTitleWithExt(file.getName()));
+			response.addHeader("Content-Length", Long.toString(file.length()));
 			try {
 				Files.copy(Paths.get(file.getPath()), response.getOutputStream());
 				response.getOutputStream().flush();

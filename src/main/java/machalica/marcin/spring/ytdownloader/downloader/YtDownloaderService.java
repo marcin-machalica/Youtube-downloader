@@ -29,15 +29,15 @@ public class YtDownloaderService implements YtDownloaderDao {
 		}
 
 		String title = getTitle(videoUrl);
-		if (title == null) {
-			title = "";
+		if (title == null || title.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
 		}
-		
+
 		String thumbnailUrl = getThumbnailUrl(videoUrl);
-		if (thumbnailUrl == null) {
-			thumbnailUrl = "";
+		if (thumbnailUrl == null || thumbnailUrl.isEmpty()) {
+			return YtDownloadFile.getEmptyYtDownloadFile();
 		}
-		
+
 		return new YtDownloadFile(formats, qrCodes, videoUrl, title, thumbnailUrl);
 	}
 
@@ -71,7 +71,7 @@ public class YtDownloaderService implements YtDownloaderDao {
 
 		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, dir);
 		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("output", "%(title)s.%(ext)s"); // --output "%(title)s"
+		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
 		request.setOption("retries", 10); // --retries 10
 		request.setOption("format", format); // --format
 
@@ -92,11 +92,12 @@ public class YtDownloaderService implements YtDownloaderDao {
 		request.setOption("ignore-errors"); // --ignore-errors
 		request.setOption("retries", 10); // --retries 10
 		request.setOption("get-filename"); // --get-filename
-		request.setOption("output", "%(title)s.%(ext)s"); // --output "%(title)s.%(ext)s"
+		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
 		request.setOption("format", format); // --format
 
 		YoutubeDLResponse response = YoutubeDL.execute(request);
-		return response.getOut().trim();
+		String filename = response.getOut().trim();
+		return filename;
 	}
 
 	private String getTitle(String videoUrl) throws YoutubeDLException {
