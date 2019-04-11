@@ -21,7 +21,6 @@ public class QrCodeGenerator {
 			byte[] pngData = pngOutputStream.toByteArray();
 			return pngData;
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			return new byte[] {};
 		}
 	}

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.sapher.youtubedl.YoutubeDL;
@@ -15,6 +16,7 @@ import com.sapher.youtubedl.YoutubeDLResponse;
 
 @Service
 public class YtDownloaderService implements YtDownloaderDao {
+	private static final Logger logger = Logger.getLogger(YtDownloaderService.class);
 
 	@Override
 	public YtDownloadFile getFileInfo(String videoUrl) throws YoutubeDLException {
@@ -63,11 +65,11 @@ public class YtDownloaderService implements YtDownloaderDao {
 		File file = new File(filePath);
 
 		if (file.exists()) {
-			System.out.println(fileName + " was downloaded before");
+			logger.debug(fileName + " was downloaded before");
 			return file;
 		}
 
-		System.out.println(fileName + " wasn't downloaded before");
+		logger.debug(fileName + " wasn't downloaded before");
 
 		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, dir);
 		request.setOption("ignore-errors"); // --ignore-errors
@@ -82,7 +84,7 @@ public class YtDownloaderService implements YtDownloaderDao {
 		if (firstSplit.length != 2) {
 			return null;
 		} else {
-			System.out.println(fileName + " downloaded successfully");
+			logger.debug(fileName + " downloaded successfully");
 			return file;
 		}
 	}

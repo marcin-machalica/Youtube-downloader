@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -20,6 +21,7 @@ import com.sapher.youtubedl.YoutubeDLException;
 
 @Controller
 public class YtDownloaderController {
+	private static final Logger logger = Logger.getLogger(YtDownloaderController.class);
 	@Autowired
 	private YtDownloaderDao ytDownloaderService;
 
@@ -44,7 +46,7 @@ public class YtDownloaderController {
 		try {
 			ytDownloadFile = ytDownloaderService.getFileInfo(url);
 		} catch (YoutubeDLException ex) {
-			ex.printStackTrace();
+			logger.error(ex);
 		}
 		model.addAttribute("file_info", ytDownloadFile);
 		return "ytdownloader";
@@ -56,13 +58,13 @@ public class YtDownloaderController {
 		try {
 			file = ytDownloaderService.downloadFile(url, format);
 		} catch (YoutubeDLException ex) {
-			ex.printStackTrace();
+			logger.error(ex);
 		}
 
 		if (file == null) {
-			System.out.println("File is null");
+			logger.error("File is null");
 		} else {
-			System.out.println(file.getPath());
+			logger.debug(file.getPath());
 
 			response.addHeader("Content-Disposition", "attachment; filename=" + YtFilenameHelper.convertFileNameToTitleWithExt(file.getName()));
 			response.addHeader("Content-Length", Long.toString(file.length()));
@@ -70,7 +72,7 @@ public class YtDownloaderController {
 				Files.copy(Paths.get(file.getPath()), response.getOutputStream());
 				response.getOutputStream().flush();
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				logger.error(ex);
 			}
 		}
 	}
