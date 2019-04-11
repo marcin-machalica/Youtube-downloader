@@ -48,7 +48,7 @@
 				</div>
 				<div class="download-url">
 					<a th:text="${format.key}"
-						th:href="@{'/yt-downloader/' + ${T(machalica.marcin.spring.ytdownloader.downloader.YtUrlHelper).getVideoUrlPart(file_info.getUrl())} + '/' + ${format.value}}"></a>
+						th:href="@{'/yt-downloader/' + ${file_info.getVideoUrlPart()} + '/' + ${format.value}}"></a>
 				</div>
 			</div>
 		</ul>
