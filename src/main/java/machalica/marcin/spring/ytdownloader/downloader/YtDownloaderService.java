@@ -3,17 +3,17 @@ package machalica.marcin.spring.ytdownloader.downloader;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sapher.youtubedl.YoutubeDL;
 import com.sapher.youtubedl.YoutubeDLException;
-import com.sapher.youtubedl.YoutubeDLRequest;
-import com.sapher.youtubedl.YoutubeDLResponse;
 
+import machalica.marcin.spring.ytdownloader.helpers.YoutubeDLService;
 import machalica.marcin.spring.ytdownloader.helpers.YtFileInfo;
 import machalica.marcin.spring.ytdownloader.helpers.YtUrlHelper;
 import machalica.marcin.spring.ytdownloader.qrcodegenerator.QrCodeGenerator;
@@ -21,7 +21,13 @@ import machalica.marcin.spring.ytdownloader.qrcodegenerator.QrCodeGenerator;
 @Service
 public class YtDownloaderService implements YtDownloaderDao {
 	private static final Logger logger = Logger.getLogger(YtDownloaderService.class);
-
+	private final YoutubeDLService youtubeDLService;
+	
+	@Autowired
+	public YtDownloaderService(YoutubeDLService youtubeDLService) {
+		this.youtubeDLService = youtubeDLService;
+	}
+	
 	@Override
 	public YtFileInfo getFileInfo(String videoUrl) throws YoutubeDLException {
 		LinkedHashMap<String, String> formats = getAvaibleFormats(videoUrl);
@@ -72,17 +78,10 @@ public class YtDownloaderService implements YtDownloaderDao {
 			logger.debug(fileName + " was downloaded before");
 			return file;
 		}
-
+		
 		logger.debug(fileName + " wasn't downloaded before");
-
-		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl, dir);
-		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
-		request.setOption("retries", 10); // --retries 10
-		request.setOption("format", format); // --format
-
-		YoutubeDLResponse response = YoutubeDL.execute(request);
-		String stdOut = response.getOut();
+		
+		String stdOut = makeDownloadRequest(videoUrl, format, dir);
 
 		String[] firstSplit = stdOut.split("Destination: ");
 		if (firstSplit.length != 2) {
@@ -94,47 +93,56 @@ public class YtDownloaderService implements YtDownloaderDao {
 	}
 
 	private String getFileName(String videoUrl, String format) throws YoutubeDLException {
-		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
-		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("retries", 10); // --retries 10
-		request.setOption("get-filename"); // --get-filename
-		request.setOption("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
-		request.setOption("format", format); // --format
-
-		YoutubeDLResponse response = YoutubeDL.execute(request);
-		String filename = response.getOut().trim();
+		Hashtable<String, String> params = new Hashtable<String, String>();
+		params.put("ignore-errors", "");	// --ignore-errors
+		params.put("retries", "10");	// --retries 10
+		params.put("get-filename", "");	// --get-filename
+		params.put("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
+		params.put("format", format);	// --format
+		
+		String filename = youtubeDLService.makeYoutubeDLRequest(videoUrl, "", params);
 		return filename;
+	}
+	
+	private String makeDownloadRequest(String videoUrl, String format, String dir) throws YoutubeDLException {
+		Hashtable<String, String> params = new Hashtable<String, String>();
+		params.put("ignore-errors", ""); // --ignore-errors
+		params.put("output", "%(title)s_" + format + ".%(ext)s"); // custom filename
+		params.put("retries", "10"); // --retries 10
+		params.put("format", format); // --format
+
+		String response = youtubeDLService.makeYoutubeDLRequest(videoUrl, dir, params);
+		return response;
 	}
 
 	private String getTitle(String videoUrl) throws YoutubeDLException {
-		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
-		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("retries", 10); // --retries 10
-		request.setOption("get-title"); // --get-title
-		request.setOption("output", "%(title)s"); // --output "%(title)s"
+		Hashtable<String, String> params = new Hashtable<String, String>();
+		params.put("ignore-errors", ""); // --ignore-errors
+		params.put("retries", "10"); // --retries 10
+		params.put("get-title", ""); // --get-title
+		params.put("output", "%(title)s"); // --output "%(title)s"
 
-		YoutubeDLResponse response = YoutubeDL.execute(request);
-		return response.getOut().trim();
+		String title = youtubeDLService.makeYoutubeDLRequest(videoUrl, "", params);
+		return title;
 	}
 
 	private String getThumbnailUrl(String videoUrl) throws YoutubeDLException {
-		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
-		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("retries", 10); // --retries 10
-		request.setOption("get-thumbnail"); // --get-thumbnail
+		Hashtable<String, String> params = new Hashtable<String, String>();
+		params.put("ignore-errors", ""); // --ignore-errors
+		params.put("retries", "10"); // --retries 10
+		params.put("get-thumbnail", ""); // --get-thumbnail
 
-		YoutubeDLResponse response = YoutubeDL.execute(request);
-		return response.getOut().trim();
+		String thumbnailUrl = youtubeDLService.makeYoutubeDLRequest(videoUrl, "", params);
+		return thumbnailUrl;
 	}
 
 	private LinkedHashMap<String, String> getAvaibleFormats(String videoUrl) throws YoutubeDLException {
-		YoutubeDLRequest request = new YoutubeDLRequest(videoUrl);
-		request.setOption("ignore-errors"); // --ignore-errors
-		request.setOption("retries", 10); // --retries 10
-		request.setOption("list-formats"); // --list-formats
+		Hashtable<String, String> params = new Hashtable<String, String>();
+		params.put("ignore-errors", ""); // --ignore-errors
+		params.put("retries", "10"); // --retries 10
+		params.put("list-formats", ""); // --list-formats
 
-		YoutubeDLResponse response = YoutubeDL.execute(request);
-		String stdOut = response.getOut();
+		String stdOut = youtubeDLService.makeYoutubeDLRequest(videoUrl, "", params);
 
 		String[] formatsSplitArr = stdOut.split("format code  extension  resolution note");
 		if (formatsSplitArr.length != 2) {
