@@ -1,22 +1,24 @@
-package machalica.marcin.spring.ytdownloader.downloader;
+package machalica.marcin.spring.ytdownloader.helpers;
 
 import java.util.LinkedHashMap;
 
-public class YtDownloadFile {
-	private static final YtDownloadFile EMPTY_YT_DOWNLOAD_FILE = new YtDownloadFile(new LinkedHashMap<String, String>(),
+public class YtFileInfo {
+	private static final YtFileInfo EMPTY_YT_FILE_INFO = new YtFileInfo(new LinkedHashMap<String, String>(),
 			new LinkedHashMap<String, String>(), "", "", "");
 	private final LinkedHashMap<String, String> formats;
 	private final LinkedHashMap<String, String> qrCodes;
 	private final String url;
+	private final String videoUrlPart;
 	private final String title;
 	private final String thumbnailUrl;
 	private String error = "";
 
-	public YtDownloadFile(LinkedHashMap<String, String> formats, LinkedHashMap<String, String> qrCodes, String url,
+	public YtFileInfo(LinkedHashMap<String, String> formats, LinkedHashMap<String, String> qrCodes, String url,
 			String title, String thumbnailUrl) {
 		this.formats = formats;
 		this.qrCodes = qrCodes;
 		this.url = url;
+		this.videoUrlPart = YtUrlHelper.getVideoUrlPart(url);
 		this.title = title;
 		this.thumbnailUrl = thumbnailUrl;
 		this.error = "";
@@ -32,6 +34,10 @@ public class YtDownloadFile {
 
 	public String getUrl() {
 		return url;
+	}
+
+	public String getVideoUrlPart() {
+		return videoUrlPart;
 	}
 
 	public String getTitle() {
@@ -50,9 +56,9 @@ public class YtDownloadFile {
 		this.error = error;
 	}
 
-	public static YtDownloadFile getEmptyYtDownloadFile() {
-		EMPTY_YT_DOWNLOAD_FILE.setError("");
-		return EMPTY_YT_DOWNLOAD_FILE;
+	public static YtFileInfo getEmptyYtFileInfo() {
+		EMPTY_YT_FILE_INFO.setError("");
+		return EMPTY_YT_FILE_INFO;
 	}
 
 	public boolean isDataPresent() {

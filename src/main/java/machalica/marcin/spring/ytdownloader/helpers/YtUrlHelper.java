@@ -1,4 +1,4 @@
-package machalica.marcin.spring.ytdownloader.downloader;
+package machalica.marcin.spring.ytdownloader.helpers;
 
 public class YtUrlHelper {
 	public static String getFullYtUrl(String videoUrlPart) {

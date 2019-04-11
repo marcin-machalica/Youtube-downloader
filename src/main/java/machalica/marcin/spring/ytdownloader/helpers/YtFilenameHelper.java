@@ -1,4 +1,4 @@
-package machalica.marcin.spring.ytdownloader.downloader;
+package machalica.marcin.spring.ytdownloader.helpers;
 
 public class YtFilenameHelper {
 	public static String convertFileNameToTitleWithExt(String filename) {

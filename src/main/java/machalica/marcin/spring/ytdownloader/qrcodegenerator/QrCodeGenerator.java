@@ -1,4 +1,4 @@
-package machalica.marcin.spring.ytdownloader.downloader;
+package machalica.marcin.spring.ytdownloader.qrcodegenerator;
 
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;

@@ -14,33 +14,37 @@ import com.sapher.youtubedl.YoutubeDLException;
 import com.sapher.youtubedl.YoutubeDLRequest;
 import com.sapher.youtubedl.YoutubeDLResponse;
 
+import machalica.marcin.spring.ytdownloader.helpers.YtFileInfo;
+import machalica.marcin.spring.ytdownloader.helpers.YtUrlHelper;
+import machalica.marcin.spring.ytdownloader.qrcodegenerator.QrCodeGenerator;
+
 @Service
 public class YtDownloaderService implements YtDownloaderDao {
 	private static final Logger logger = Logger.getLogger(YtDownloaderService.class);
 
 	@Override
-	public YtDownloadFile getFileInfo(String videoUrl) throws YoutubeDLException {
+	public YtFileInfo getFileInfo(String videoUrl) throws YoutubeDLException {
 		LinkedHashMap<String, String> formats = getAvaibleFormats(videoUrl);
 		if (formats == null || formats.isEmpty()) {
-			return YtDownloadFile.getEmptyYtDownloadFile();
+			return YtFileInfo.getEmptyYtFileInfo();
 		}
 
 		LinkedHashMap<String, String> qrCodes = getQrCodes(videoUrl, formats);
 		if (qrCodes == null || qrCodes.isEmpty()) {
-			return YtDownloadFile.getEmptyYtDownloadFile();
+			return YtFileInfo.getEmptyYtFileInfo();
 		}
 
 		String title = getTitle(videoUrl);
 		if (title == null || title.isEmpty()) {
-			return YtDownloadFile.getEmptyYtDownloadFile();
+			return YtFileInfo.getEmptyYtFileInfo();
 		}
 
 		String thumbnailUrl = getThumbnailUrl(videoUrl);
 		if (thumbnailUrl == null || thumbnailUrl.isEmpty()) {
-			return YtDownloadFile.getEmptyYtDownloadFile();
+			return YtFileInfo.getEmptyYtFileInfo();
 		}
 
-		return new YtDownloadFile(formats, qrCodes, videoUrl, title, thumbnailUrl);
+		return new YtFileInfo(formats, qrCodes, videoUrl, title, thumbnailUrl);
 	}
 
 	private LinkedHashMap<String, String> getQrCodes(String videoUrl, LinkedHashMap<String, String> formats) {
@@ -84,7 +88,7 @@ public class YtDownloaderService implements YtDownloaderDao {
 		if (firstSplit.length != 2) {
 			return null;
 		} else {
-			logger.info(fileName + " downloaded successfully from " + videoUrl);
+			logger.info(fileName + " downloaded successfully from " + YtUrlHelper.getFullYtUrl(videoUrl));
 			return file;
 		}
 	}
