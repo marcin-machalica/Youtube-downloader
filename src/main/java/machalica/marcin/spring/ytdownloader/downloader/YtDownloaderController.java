@@ -19,15 +19,23 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.sapher.youtubedl.YoutubeDLException;
 
+import machalica.marcin.spring.ytdownloader.helpers.YtFileInfo;
+import machalica.marcin.spring.ytdownloader.helpers.YtFilenameHelper;
+import machalica.marcin.spring.ytdownloader.helpers.YtUrlHelper;
+
 @Controller
 public class YtDownloaderController {
 	private static final Logger logger = Logger.getLogger(YtDownloaderController.class);
+	private final YtDownloaderDao ytDownloaderService;
+
 	@Autowired
-	private YtDownloaderDao ytDownloaderService;
+	public YtDownloaderController(YtDownloaderDao ytDownloaderService) {
+		this.ytDownloaderService = ytDownloaderService;
+	}
 
 	@GetMapping("/yt-downloader")
 	public String index(ModelMap model) {
-		model.addAttribute("file_info", YtDownloadFile.getEmptyYtDownloadFile());
+		model.addAttribute("file_info", YtFileInfo.getEmptyYtFileInfo());
 		return "ytdownloader";
 	}
 
@@ -42,19 +50,19 @@ public class YtDownloaderController {
 	public String getFileInfo(@PathVariable String url, ModelMap model) {
 		url = YtUrlHelper.getFullYtUrl(url);
 
-		YtDownloadFile ytDownloadFile = YtDownloadFile.getEmptyYtDownloadFile();
+		YtFileInfo ytFileInfo = YtFileInfo.getEmptyYtFileInfo();
 		try {
-			ytDownloadFile = ytDownloaderService.getFileInfo(url);
+			ytFileInfo = ytDownloaderService.getFileInfo(url);
 		} catch (YoutubeDLException ex) {
 			if (ex.toString().contains("Incomplete YouTube ID")) {
 				logger.debug(ex);
-				ytDownloadFile.setError("Not valid URL: " + url);
+				ytFileInfo.setError("Not valid URL: " + url);
 			} else {
 				logger.error(ex);
 			}
 		}
 
-		model.addAttribute("file_info", ytDownloadFile);
+		model.addAttribute("file_info", ytFileInfo);
 		return "ytdownloader";
 	}
 
