@@ -12,9 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.sapher.youtubedl.YoutubeDLException;
 
@@ -29,8 +29,17 @@ public class YtDownloaderController {
 		return "ytdownloader";
 	}
 
-	@RequestMapping(value = "yt-downloader", method = RequestMethod.POST)
-	public String getFileInfo(@ModelAttribute("url") String url, ModelMap model) {
+	@PostMapping("/yt-downloader")
+	public RedirectView formatsRedirect(@ModelAttribute("url") String url) {
+		RedirectView redirectView = new RedirectView();
+		redirectView.setUrl("/yt-downloader/" + YtUrlHelper.getVideoUrlPart(url));
+		return redirectView;
+	}
+
+	@GetMapping("/yt-downloader/{url}")
+	public String getFileInfo(@PathVariable String url, ModelMap model) {
+		url = YtUrlHelper.getFullYtUrl(url);
+
 		YtDownloadFile ytDownloadFile = YtDownloadFile.getEmptyYtDownloadFile();
 		try {
 			ytDownloadFile = ytDownloaderService.getFileInfo(url);
@@ -41,9 +50,8 @@ public class YtDownloaderController {
 		return "ytdownloader";
 	}
 
-	@GetMapping("/yt-downloader/download")
-	public void download(@RequestParam String url, @RequestParam(name = "format") String format,
-			HttpServletResponse response) {
+	@GetMapping("/yt-downloader/{url}/{format}")
+	public void download(@PathVariable String url, @PathVariable String format, HttpServletResponse response) {
 		File file = null;
 		try {
 			file = ytDownloaderService.downloadFile(url, format);
