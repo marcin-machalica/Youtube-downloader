@@ -19,16 +19,23 @@
 					<div class="ui input">
 						<input type="text" name="url" placeholder="Link to video" />
 					</div>
-					<input class="ui primary button" type="submit" name="submit" value="Search" />
+					<input class="ui primary button" type="submit" name="submit"
+						value="Search" />
 				</form>
 			</div>
-			<hr />
-			<div id="url-data-segment">
-				<img th:src="${file_info.getThumbnailUrl()}" alt="" width="150"
-					height="100" />
-				<div id="url-data-text-segment">
-					<p th:text="${file_info.getTitle()}"></p>
-					<a th:text="${file_info.getUrl()}" th:href="${file_info.getUrl()}"></a>
+			<div th:unless="${file_info.getError().isEmpty()}"
+				class="error-segment">
+				<p th:text="${file_info.getError()}"></p>
+			</div>
+			<div th:if="${file_info.isDataPresent()}">
+				<hr />
+				<div id="url-data-segment">
+					<img th:src="${file_info.getThumbnailUrl()}" alt="" width="150"
+						height="100" />
+					<div id="url-data-text-segment">
+						<p th:text="${file_info.getTitle()}"></p>
+						<a th:text="${file_info.getUrl()}" th:href="${file_info.getUrl()}"></a>
+					</div>
 				</div>
 			</div>
 		</div>
