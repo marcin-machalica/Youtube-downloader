@@ -26,8 +26,12 @@ import machalica.marcin.spring.ytdownloader.helpers.YtUrlHelper;
 @Controller
 public class YtDownloaderController {
 	private static final Logger logger = Logger.getLogger(YtDownloaderController.class);
+	private final YtDownloaderDao ytDownloaderService;
+
 	@Autowired
-	private YtDownloaderDao ytDownloaderService;
+	public YtDownloaderController(YtDownloaderDao ytDownloaderService) {
+		this.ytDownloaderService = ytDownloaderService;
+	}
 
 	@GetMapping("/yt-downloader")
 	public String index(ModelMap model) {
