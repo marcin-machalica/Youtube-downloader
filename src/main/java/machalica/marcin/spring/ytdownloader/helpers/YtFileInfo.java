@@ -69,4 +69,65 @@ public class YtFileInfo {
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((error == null) ? 0 : error.hashCode());
+		result = prime * result + ((formats == null) ? 0 : formats.hashCode());
+		result = prime * result + ((qrCodes == null) ? 0 : qrCodes.hashCode());
+		result = prime * result + ((thumbnailUrl == null) ? 0 : thumbnailUrl.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		result = prime * result + ((videoUrlPart == null) ? 0 : videoUrlPart.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		YtFileInfo other = (YtFileInfo) obj;
+		if (error == null) {
+			if (other.error != null)
+				return false;
+		} else if (!error.equals(other.error))
+			return false;
+		if (formats == null) {
+			if (other.formats != null)
+				return false;
+		} else if (!formats.equals(other.formats))
+			return false;
+		if (qrCodes == null) {
+			if (other.qrCodes != null)
+				return false;
+		} else if (!qrCodes.equals(other.qrCodes))
+			return false;
+		if (thumbnailUrl == null) {
+			if (other.thumbnailUrl != null)
+				return false;
+		} else if (!thumbnailUrl.equals(other.thumbnailUrl))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		if (videoUrlPart == null) {
+			if (other.videoUrlPart != null)
+				return false;
+		} else if (!videoUrlPart.equals(other.videoUrlPart))
+			return false;
+		return true;
+	}
+
 }
