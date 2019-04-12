@@ -5,7 +5,7 @@ public class YtFilenameHelper {
 		if (filename == null) {
 			return "";
 		}
-		
+
 		if (!filename.contains("_") || (filename.length() <= filename.lastIndexOf('_') + 1)) {
 			return filename;
 		}

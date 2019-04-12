@@ -19,8 +19,8 @@ public class YtUrlHelper {
 			if (!videoUrlPart.contains("/")) {
 				return videoUrlPart;
 			}
-		} 
-		
+		}
+
 		return url;
 	}
 }

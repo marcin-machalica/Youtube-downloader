@@ -39,7 +39,6 @@ public class YtDownloaderServiceTests {
 	@Mock
 	private LocalFileHelper localFileHelper;
 
-	private static final LinkedHashMap<String, String> emptyFormats = new LinkedHashMap<String, String>();
 	private static final LinkedHashMap<String, String> formats = new LinkedHashMap<String, String>();
 
 	private static final String videoUrl = "https://www.youtube.com/watch?v=qwerty";
@@ -55,7 +54,6 @@ public class YtDownloaderServiceTests {
 	private static final String notExistingVideoUrl = "https://www.youtube.com/watch?v=azerty";
 	private static final String dir = "./downloaded_files/";
 	private static final String dirWithFilename = "downloaded_files/" + filename;
-	private static final String notExistingDir = "notExistingDir";
 
 	@BeforeClass
 	public static void setupOnce() {
